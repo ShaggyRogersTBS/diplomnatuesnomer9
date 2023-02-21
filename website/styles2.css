@@ -1,0 +1,235 @@
+body {
+	background-image: url('tback.jpg');
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+}
+
+.graph {
+	position: absolute;
+	top: 44%;
+	left: 15.5%;
+	width: 31%;
+	background-color: #f2f2f2;
+	padding: 20px;
+	text-overflow: auto;
+	border-radius: 10px;
+	text-align: center;
+}
+
+.graph2 {
+	position: absolute;
+	top: 44%;
+	left: 53%;
+	width: 30.5%;
+	background-color: #f2f2f2;
+	padding: 20px;
+	border-radius: 10px;
+	text-align: center;
+}
+
+.data-table {
+	position: absolute;
+	top: 15%;
+	left: 26.5%;
+	width: 40%;
+	transform: translate(-50%, 0);
+	background-color: #f2f2f2;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.data-table table {
+	position: relative;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+
+.data-table th, td {
+	padding: 8px;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+}
+
+.data-table th {
+	background-color: #4CAF50;
+	color: white;
+}
+
+.data-table tr:hover {
+	background-color: #f5f5f5;
+}
+
+.tableone-text {
+	position: relative;
+	left: 37%;
+}
+
+
+
+.data-table2 {
+	position: absolute;
+	top: 15%;
+	left: 73%;
+	width: 40%;
+	transform: translate(-50%, 0);
+	background-color: #f2f2f2;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.data-table2 table {
+	position: relative;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+
+.data-table2 th, td {
+	padding: 8px;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+}
+
+.data-table2 th {
+	background-color: #4CAF50;
+	color: white;
+}
+
+.data-table2 tr:hover {
+	background-color: #f5f5f5;
+}
+
+.tabletwo-text {
+	position: relative;
+	left: 37%;
+}
+
+.nav{
+	background-color: #333;
+	overflow: hidden;
+    border:1px solid #ccc;
+    border-width:1px 0;
+    list-style:none;
+    margin:0;
+    color: white;
+    text-align:center;
+    font-size: 25px;
+    text-decoration: none;
+    padding: 14px 16px;
+}
+
+.nav li{
+    display:inline;
+}
+
+.nav a{
+    display:inline-block;
+    padding:10px;
+    color: #f2f2f2;
+    text-decoration: none;
+    font-family: "Copperplate", fantasy;
+}
+
+/* Dropdown Button */
+.dropbtn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border-radius: 10px;
+  border-color: #4CAF50;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: absolute;
+  top: 34vh;
+  left:8%;
+  display: inline-block;
+  border-radius: 10px;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  align-content: center;
+  position: absolute;
+  background-color: #f1f1f1;
+  width: 100%;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  text-align: center;
+  z-index: 1;
+  border-radius: 10px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  border-radius: 10px;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd;}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {display: block;}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {background-color: #3e8e41;}
+
+/* Dropdown Button */
+.dropbtn2 {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border-radius: 10px;
+  border-color: #4CAF50;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown2 {
+  position: absolute;
+  top: 43vh;
+  left:84.5%;
+  display: inline-block;
+  border-radius: 10px;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content2 {
+  display: none;
+  align-content: center;
+  position: absolute;
+  background-color: #f1f1f1;
+  width: 100%;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  text-align: center;
+  z-index: 1;
+  border-radius: 10px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content2 a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  border-radius: 10px;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content2 a:hover {background-color: #ddd;}
+
+/* Show the dropdown menu on hover */
+.dropdown2:hover .dropdown-content2 {display: block;}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown2:hover .dropbtn2 {background-color: #3e8e41;}
