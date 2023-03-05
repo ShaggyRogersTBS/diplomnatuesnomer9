@@ -29,28 +29,35 @@ void setup() {
   connectToMySQL();
 }
 
+float Calculate_WindDirection() {
+  int winddirection = analogRead(36); // VP = 36 VN = 39
+  return map(winddirection,0,3095,0,359);
+}
+
 void loop() {
   float temperature = bmp.readTemperature(); // Read temperature value from the BMP180 sensor
   float pressure = bmp.readPressure() / 100.0F; // Read air pressure value from the BMP180 sensor and convert from Pa to hPa
   float humidity = dht.readHumidity(); // Read air humidity value from the DHT11 sensor
 
   // Construct the SQL query to insert the temperature, pressure, and humidity values into the database
-  String query = "INSERT INTO `weather_data` (`temperature`, `pressure`, `humidity`) VALUES ('";
+  String query = "INSERT INTO `weather_data` (`temperature`, `pressure`, `humidity`, `wind_direction`) VALUES ('";
   query += temperature;
   query += "', '";
   query += pressure;
   query += "', '";
   query += humidity;
+  query += "', '";
+  query += wind_direction;
   query += "')";
 
   // Execute the SQL query
-  MySQL_Cursor* cursor = new MySQL_Cursor(&client);
+  MySQL_Cursor* cursor = new MySQL_Cursor(&conn);
   cursor->execute(query);
   delete cursor;
 
   Serial.println("Data uploaded to MySQL database!");
 
-  delay(600000); // Delay 10 minuti
+  delay(600000); // Wait for 10 minutes before uploading the next set of data
 }
 
 void connectToWiFi() {
