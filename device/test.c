@@ -1,10 +1,12 @@
 #include <WiFi.h>
 #include <MySQL_Connection.h>
 #include <MySQL_Cursor.h>
+#include <Adafruit_BMP085.h>
 #include <DHT.h>
 
-#define DHTPIN 23 // Define the pin to which the DHT11 sensor is connected
-#define DHTTYPE DHT11 // Define the type of DHT sensor
+#define BMP_SDA 18 // Define the SDA pin for the BMP180 sensor
+#define BMP_SCL 19 // Define the SCL pin for the BMP180 sensor
+#define DHT_PIN 23 // Define the data pin for the DHT11 sensor
 
 // Replace with your network credentials and MySQL server details
 const char* ssid = "your_SSID";
@@ -14,29 +16,29 @@ const char* user = "your_USERNAME";
 const char* passwordDB = "your_PASSWORD";
 const char* database = "weather_diplomna";
 
-// Create an instance of the DHT sensor and WiFiClient object
-DHT dht(DHTPIN, DHTTYPE);
+// Create instances of the BMP180 sensor, DHT11 sensor, and WiFiClient object
+Adafruit_BMP085 bmp(BMP_SDA, BMP_SCL);
+DHT dht(DHT_PIN, DHT11);
 WiFiClient client;
 
 void setup() {
   Serial.begin(9600);
+  bmp.begin();
   dht.begin();
   connectToWiFi();
   connectToMySQL();
 }
 
 void loop() {
-  float temperature = dht.readTemperature(); // Read temperature value from the DHT11 sensor
-  float humidity = dht.readHumidity(); // Read humidity value from the DHT11 sensor
-  
-  if (isnan(temperature) || isnan(humidity)) { // Check if any value is NaN
-    Serial.println("Failed to read from DHT sensor!");
-    return;
-  }
+  float temperature = bmp.readTemperature(); // Read temperature value from the BMP180 sensor
+  float pressure = bmp.readPressure() / 100.0F; // Read air pressure value from the BMP180 sensor and convert from Pa to hPa
+  float humidity = dht.readHumidity(); // Read air humidity value from the DHT11 sensor
 
-  // Construct the SQL query to insert the temperature and humidity values into the database
-  String query = "INSERT INTO `weather_data` (`temperature`, `humidity`) VALUES ('";
+  // Construct the SQL query to insert the temperature, pressure, and humidity values into the database
+  String query = "INSERT INTO `weather_data` (`temperature`, `pressure`, `humidity`) VALUES ('";
   query += temperature;
+  query += "', '";
+  query += pressure;
   query += "', '";
   query += humidity;
   query += "')";
@@ -47,8 +49,8 @@ void loop() {
   delete cursor;
 
   Serial.println("Data uploaded to MySQL database!");
-  
-  delay(30000); // Wait for 30 seconds before uploading the next set of data
+
+  delay(600000); // Delay 10 minuti
 }
 
 void connectToWiFi() {
