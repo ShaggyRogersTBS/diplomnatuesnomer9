@@ -19,7 +19,7 @@
         <h1 class = "tableone-text">Станция №1</h1>
         <table>
             <tr>
-                <th>Precipitation (hPa)</th>
+                <th>Air Pressure (hPa)</th>
                 <th>Humidity (g.m-3)</th>
                 <th>Temperature (°C)</th>
                 <th>Wind Speed (km/h)</th>
@@ -36,13 +36,13 @@
                 if (!$conn) {
                     die("Connection failed: " . mysqli_connect_error());
                 }
-                $sql = "SELECT precipitation, humidity, temperature, wind_speed, wind_direction FROM weather";
+                $sql = "SELECT pressure, humidity, temperature, wind_speed, wind_direction FROM weather";
                 $result = mysqli_query($conn, $sql);
                 if (mysqli_num_rows($result) > 0) {
                     // Output data of each row
                     while($row = mysqli_fetch_assoc($result)) {
                         echo "<tr>";
-                        echo "<td>" . $row["precipitation"] . "</td>";
+                        echo "<td>" . $row["pressure"] . "</td>";
                         echo "<td>" . $row["humidity"] . "</td>";
                         echo "<td>" . $row["temperature"] . "</td>";
                         echo "<td>" . $row["wind_speed"] . "</td>";
@@ -81,13 +81,13 @@
                 if (!$conn) {
                     die("Connection failed: " . mysqli_connect_error());
                 }
-                $sql = "SELECT precipitation, humidity, temperature, wind_speed, wind_direction FROM weather2";
+                $sql = "SELECT pressure, humidity, temperature, wind_speed, wind_direction FROM weather2";
                 $result = mysqli_query($conn, $sql);
                 if (mysqli_num_rows($result) > 0) {
                     // Output data of each row
                     while($row = mysqli_fetch_assoc($result)) {
                         echo "<tr>";
-                        echo "<td>" . $row["precipitation"] . "</td>";
+                        echo "<td>" . $row["pressure"] . "</td>";
                         echo "<td>" . $row["humidity"] . "</td>";
                         echo "<td>" . $row["temperature"] . "</td>";
                         echo "<td>" . $row["wind_speed"] . "</td>";
@@ -157,7 +157,7 @@
                 die("Connection failed: " . mysqli_connect_error());
             }
 
-            $sql = "SELECT MIN(precipitation) as min_prec, MAX(precipitation) as max_prec, AVG(precipitation) as avg_prec FROM weather";
+            $sql = "SELECT MIN(pressure) as min_prec, MAX(pressure) as max_prec, AVG(pressure) as avg_prec FROM weather";
             $result = mysqli_query($conn, $sql);
 
             if (mysqli_num_rows($result) > 0) {
@@ -293,7 +293,7 @@
                 die("Connection failed: " . mysqli_connect_error());
             }
 
-            $sql = "SELECT MIN(precipitation) as min_prec, MAX(precipitation) as max_prec, AVG(precipitation) as avg_prec FROM weather2";
+            $sql = "SELECT MIN(pressure) as min_prec, MAX(pressure) as max_prec, AVG(pressure) as avg_prec FROM weather2";
             $result = mysqli_query($conn, $sql);
 
             if (mysqli_num_rows($result) > 0) {
