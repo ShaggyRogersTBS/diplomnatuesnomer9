@@ -1,8 +1,7 @@
 #include <WiFi.h>
-#include <MySQL_Connection.h>
-#include <MySQL_Cursor.h>
 #include <Adafruit_BMP085.h>
 #include <DHT.h>
+#include <HTTPClient.h>
 
 #define BMP_SDA 18 // Define the SDA pin for the BMP180 sensor
 #define BMP_SCL 19 // Define the SCL pin for the BMP180 sensor
@@ -11,10 +10,6 @@
 // Replace with your network credentials and MySQL server details
 const char* ssid = "your_SSID";
 const char* password = "your_PASSWORD";
-const char* server = "your_SERVER_IP_ADDRESS";
-const char* user = "your_USERNAME";
-const char* passwordDB = "your_PASSWORD";
-const char* database = "weather_diplomna";
 
 // Create instances of the BMP180 sensor, DHT11 sensor, and WiFiClient object
 Adafruit_BMP085 bmp(BMP_SDA, BMP_SCL);
@@ -34,13 +29,10 @@ float Calculate_WindDirection() {
   return map(winddirection,0,3095,0,359);
 }
 
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
-
 void loop() {
-  float temperature = bmp.readTemperature();                        // Read temperature value from the BMP180 sensor
-  float pressure = bmp.readPressure() / 100.0F; // Read air pressure value from the BMP180 sensor and convert from Pa to hPa
-  float humidity = dht.readHumidity(); // Read air humidity value from the DHT11 sensor
+  float temperature = bmp.readTemperature();                       
+  float pressure = bmp.readPressure() / 100.0F; 
+  float humidity = dht.readHumidity(); 
 
   String url = "http://example.com/weather_data.php?";
   url += "temperature=" + String(temperature);
@@ -51,8 +43,8 @@ void loop() {
 
   WiFiClient client;
   HTTPClient http;
-  http.begin(client, url);  // Specify request destination
-  int httpCode = http.GET(); // Send the HTTP request
+  http.begin(client, url);  
+  int httpCode = http.GET(); 
 
   if (httpCode > 0) {
     Serial.printf("[HTTP] GET... code: %d\n", httpCode);
@@ -64,7 +56,7 @@ void loop() {
     Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
   }
 
-  http.end(); // Close HTTP connection
+  http.end(); 
 
   Serial.println("Data uploaded to server!");
 
@@ -86,11 +78,3 @@ void connectToWiFi() {
   Serial.println(WiFi.localIP());
 }
 
-void connectToMySQL() {
-  Serial.print("Connecting to MySQL server...");
-  if (client.connect(server, 3306, user, passwordDB, database)) {
-    Serial.println("MySQL server connected!");
-  } else {
-    Serial.println("MySQL server connection failed!");
-  }
-}
