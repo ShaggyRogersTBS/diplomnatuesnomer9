@@ -34,7 +34,7 @@ void loop() {
   float pressure = bmp.readPressure() / 100.0F; 
   float humidity = dht.readHumidity(); 
 
-  String url = "http://78.154.15.171/weather_data.php?";
+  String url = "http://78.154.15.171/phpscript.php?";
   url += "temperature=" + String(temperature);
   url += "&pressure=" + String(pressure);
   url += "&humidity=" + String(humidity);
