@@ -34,30 +34,41 @@ float Calculate_WindDirection() {
   return map(winddirection,0,3095,0,359);
 }
 
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+
 void loop() {
   float temperature = bmp.readTemperature();                        // Read temperature value from the BMP180 sensor
   float pressure = bmp.readPressure() / 100.0F; // Read air pressure value from the BMP180 sensor and convert from Pa to hPa
   float humidity = dht.readHumidity(); // Read air humidity value from the DHT11 sensor
 
-  String query = "INSERT INTO `weather_data` (`temperature`, `pressure`, `humidity`, `wind_direction`, `wind_speed`) VALUES ('";
-  query += temperature;
-  query += "', '";
-  query += pressure;
-  query += "', '";
-  query += humidity;
-  query += "', '";
-  query += wind_direction;
-  query += "', '";
-  query += wind_speed;
-  query += "')";
+  String url = "http://example.com/weather_data.php?";
+  url += "temperature=" + String(temperature);
+  url += "&pressure=" + String(pressure);
+  url += "&humidity=" + String(humidity);
+  url += "&wind_direction=" + String(wind_direction);
+  url += "&wind_speed=" + String(wind_speed);
 
-  MySQL_Cursor* cursor = new MySQL_Cursor(&conn);
-  cursor->execute(query);
-  delete cursor;
+  WiFiClient client;
+  HTTPClient http;
+  http.begin(client, url);  // Specify request destination
+  int httpCode = http.GET(); // Send the HTTP request
 
-  Serial.println("Data uploaded to MySQL database!");
+  if (httpCode > 0) {
+    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+    if (httpCode == HTTP_CODE_OK) {
+      String payload = http.getString();
+      Serial.println(payload);
+    }
+  } else {
+    Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+  }
 
-  delay(600000); 
+  http.end(); // Close HTTP connection
+
+  Serial.println("Data uploaded to server!");
+
+  delay(600000);
 }
 
 void connectToWiFi() {
