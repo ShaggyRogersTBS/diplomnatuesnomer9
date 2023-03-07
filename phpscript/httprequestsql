@@ -1,7 +1,10 @@
 <?php
 
-if(isset($_GET["temperature"])) {
+if(isset($_GET["temperature"], $_GET["humidity"], $_GET["wind_speed"], $_GET["wind_direction"])) {
    $temperature = $_GET["temperature"]; 
+   $humidity = $_GET["humidity"];
+   $wind_speed = $_GET["wind_speed"];
+   $wind_direction = $_GET["wind_direction"];
 
    $servername = "localhost";
    $username = "root";
@@ -13,7 +16,8 @@ if(isset($_GET["temperature"])) {
       die("MySQL connection failed: " . $connection->connect_error);
    }
 
-   $sql = "INSERT INTO weather (temperature) VALUES ($temperature)";
+   $sql = "INSERT INTO weather (temperature, humidity, wind_speed, wind_direction) 
+           VALUES ($temperature, $humidity, $wind_speed, $wind_direction)";
 
    if ($connection->query($sql) === TRUE) {
       echo "New record created successfully";
