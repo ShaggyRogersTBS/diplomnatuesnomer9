@@ -8,8 +8,8 @@
 #define DHT_PIN 23 // Define the data pin for the DHT11 sensor
 
 // Replace with your network credentials and MySQL server details
-const char* ssid = "your_SSID";
-const char* password = "your_PASSWORD";
+const char* ssid = "slashcrash";
+const char* password = "esp32esp";
 
 // Create instances of the BMP180 sensor, DHT11 sensor, and WiFiClient object
 Adafruit_BMP085 bmp(BMP_SDA, BMP_SCL);
@@ -34,7 +34,7 @@ void loop() {
   float pressure = bmp.readPressure() / 100.0F; 
   float humidity = dht.readHumidity(); 
 
-  String url = "http://example.com/weather_data.php?";
+  String url = "http://78.154.15.171/weather_data.php?";
   url += "temperature=" + String(temperature);
   url += "&pressure=" + String(pressure);
   url += "&humidity=" + String(humidity);
