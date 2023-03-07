@@ -64,7 +64,7 @@
         <table>
 
             <tr>
-                <th>Precipitation (hPa)</th>
+                <th>Air Pressure (hPa)</th>
                 <th>Humidity (g.m-3)</th>
                 <th>Temperature (°C)</th>
                 <th>Wind Speed (km/h)</th>
