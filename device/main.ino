@@ -9,15 +9,21 @@
 const int wind_dir_pin = 36; // номер на пин за посока на вятъра
 const char* ssid = "slashcrash"; // име на WiFi мрежа
 const char* password = "esp32esp"; // парола на WiFi мрежа
-const char* url_base = "http://78.154.15.171/phpscript.php?" //линк към уеб сървър
+const char* url_base = "http://78.154.15.171/phpscript.php?"; //линк към уеб сървър
 
-Adafruit_BMP085 bmp(BMP_SDA, BMP_SCL);
+Adafruit_BMP085 bmp;
 DHT dht(DHT_PIN, DHT11);
 WiFiClient client;
+
+// DECLARE
+//float bmp;
+float wind_direction;
+float wind_speed;
 
 // Начало на сесии за WiFI, DHT11, BMP180
 void setup() {
   Serial.begin(9600);
+  Wire.begin(BMP_SDA, BMP_SCL);
   bmp.begin();
   dht.begin();
   connectToWiFi();
@@ -46,7 +52,7 @@ void loop() {
   WiFiClient client;
   HTTPClient http;
   http.begin(client, url);  
-  int httpCode = http.POST(); 
+  int httpCode = http.POST(url); 
 
   if (httpCode > 0) {
     Serial.printf("[HTTP] POST... code: %d\n", httpCode);
