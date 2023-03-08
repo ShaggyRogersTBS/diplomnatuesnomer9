@@ -44,16 +44,16 @@ void loop() {
   WiFiClient client;
   HTTPClient http;
   http.begin(client, url);  
-  int httpCode = http.GET(); 
+  int httpCode = http.POST(); 
 
   if (httpCode > 0) {
-    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+    Serial.printf("[HTTP] POST... code: %d\n", httpCode);
     if (httpCode == HTTP_CODE_OK) {
       String payload = http.getString();
       Serial.println(payload);
     }
   } else {
-    Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+    Serial.printf("[HTTP] POST... failed, error: %s\n", http.errorToString(httpCode).c_str());
   }
 
   http.end(); 
