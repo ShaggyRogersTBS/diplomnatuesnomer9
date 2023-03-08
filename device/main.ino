@@ -3,38 +3,40 @@
 #include <DHT.h>
 #include <HTTPClient.h>
 
-#define BMP_SDA 18 // Define the SDA pin for the BMP180 sensor
-#define BMP_SCL 19 // Define the SCL pin for the BMP180 sensor
-#define DHT_PIN 23 // Define the data pin for the DHT11 sensor
+#define BMP_SDA 18 // SDA пин за BMP180
+#define BMP_SCL 19 // SCL пин за BMP180
+#define DHT_PIN 23 // номер на пин за инфо на DHT11
+const int wind_dir_pin = 36; // номер на пин за посока на вятъра
+const char* ssid = "slashcrash"; // име на WiFi мрежа
+const char* password = "esp32esp"; // парола на WiFi мрежа
+const char* url_base = "http://78.154.15.171/phpscript.php?" //линк към уеб сървър
 
-// Replace with your network credentials and MySQL server details
-const char* ssid = "slashcrash";
-const char* password = "esp32esp";
-
-// Create instances of the BMP180 sensor, DHT11 sensor, and WiFiClient object
 Adafruit_BMP085 bmp(BMP_SDA, BMP_SCL);
 DHT dht(DHT_PIN, DHT11);
 WiFiClient client;
 
+// Начало на сесии за WiFI, DHT11, BMP180
 void setup() {
   Serial.begin(9600);
   bmp.begin();
   dht.begin();
   connectToWiFi();
-  connectToMySQL();
+  //connectToMySQL();
 }
 
+// Първоначално измерване посока на вятъра
 float Calculate_WindDirection() {
-  int winddirection = analogRead(36); // VP = 36 VN = 39
+  int winddirection = analogRead(wind_dir_pin); // VP = 36 VN = 39
   return map(winddirection,0,3095,0,359);
 }
 
+// Измерване на BMP и DHT + HTTP заявки към уеб сървър
 void loop() {
   float temperature = bmp.readTemperature();                       
   float pressure = bmp.readPressure() / 100.0F; 
   float humidity = dht.readHumidity(); 
 
-  String url = "http://78.154.15.171/phpscript.php?";
+  String url = String(url_base);
   url += "temperature=" + String(temperature);
   url += "&pressure=" + String(pressure);
   url += "&humidity=" + String(humidity);
@@ -63,6 +65,7 @@ void loop() {
   delay(600000);
 }
 
+// Свързване към WiFi
 void connectToWiFi() {
   Serial.print("Connecting to WiFi...");
   WiFi.begin(ssid, password);
