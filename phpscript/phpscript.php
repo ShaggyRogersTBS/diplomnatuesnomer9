@@ -1,11 +1,11 @@
 <?php
 
-if(isset($_GET["temperature"], $_GET["humidity"], $_GET["wind_speed"], $_GET["pressure"], $_GET["wind_direction"])) {
-   $temperature = $_GET["temperature"]; 
-   $humidity = $_GET["humidity"];
-   $wind_speed = $_GET["wind_speed"];
-   $pressure = $_GET["pressure"];
-   $wind_direction = $_GET["wind_direction"];
+if(isset($_POST["temperature"], $_POST["humidity"], $_POST["wind_speed"], $_POST["pressure"], $_POST["wind_direction"])) {
+   $temperature = $_POST["temperature"]; 
+   $humidity = $_POST["humidity"];
+   $wind_speed = $_POST["wind_speed"];
+   $pressure = $_POST["pressure"];
+   $wind_direction = $_POST["wind_direction"];
 
    $servername = "localhost";
    $username = "root";
