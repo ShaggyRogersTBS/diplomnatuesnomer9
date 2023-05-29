@@ -1,5 +1,6 @@
 #include <WiFi.h>
-#include <Wire.h>
+#include <HTTPClient.h>
+//#include <Wire.h>
 #include <time.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
@@ -9,7 +10,7 @@ Adafruit_BMP085 bmp;             // I2C
 
 const char* ssid     = "slashcrash";
 const char* password = "esp32esp";
-
+const char* serverURL = "http://172.20.10.2/weather.php";
 const char* Timezone = "EST-2METDST,M3.5.0/01,M10.5.0/02"; // Most of Europe
 
 String      Format   = "X";       // Time format M for dd-mm-yy and 23:59:59, "I" for mm-dd-yy and 12:59:59 PM, "X" for Metric units but WSpeed in MPH
@@ -54,37 +55,28 @@ void IRAM_ATTR Timer_TImeout_ISR() {
 //#########################################################################################
 void setup() {
   Serial.begin(115200);
-  //Wire.begin(SDA, SCL);                        // ESP8266 version 
-  Wire.begin(BMP180_SDA_PIN, BMP180_SCL_PIN);
-  bmp.begin();           // For Adafruit sensors use address 0x77, for most 3rd party types use address 0x76
-  //if (!status) Serial.println("Could not find a valid BME280 sensor, check wiring!"); // Check for a sensor
-  //display.init();                                // Initialise the display
-  //display.flipScreenVertically();                // In my case flip the screen around by 180°
-  //display.setContrast(128);                      // If you want turn the display contrast down, 255 is maxium and 0 in minimum, in practice about 128 is OK
+  //Wire.begin(SDA, SCL);                       
+  //Wire.begin();
+  //bmp.begin();           // For Adafruit sensors use address 0x77, for most 3rd party types use address 0x76              
   StartWiFi();
   Start_Time_Services();
   Setup_Interrupts_and_Initialise_Clock();       // Now setup a timer interrupt to occur every 1-second, to keep seconds accurate
   for (int index = 0; index < WS_Samples; index++) { // Now clear the Wind Speed average array
     WSpeedReadings[index] = 0;
   }
+  //if (!bmp.begin(BMP085_STANDARD)) {
+  //Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+  //while (1) {}
+  //}
 }
 //#########################################################################################
 void loop() {
-  UpdateLocalTime();     // The variables 'Date_str' and 'Time_str' now have current date-time values
-  float temperature = bmp.readTemperature();
-  float pressure = bmp.readPressure() / 100.0; // convert to hPa
-  //BME280_Read_Sensor();  // The variables 'bme_temp', 'bme_humi', 'bme_pres' now have current values
-  //display.clear();
-  //display.drawString(0, 0, Date_str);                                                                                    // Display current date
-  //display.drawString((Format=="I"?68:85), 0, Time_str);                                                                  // Adjust position for addition of AM/PM indicator if required
-  //display.drawLine(0,12,128,12);                                                                                         // Draw a line to seperate date and time section
-  //display.setFont(ArialMT_Plain_16);                                                                                     // Set the Font size larger
-  //display.drawString(2, 20, String(bme_temp, 1)+"°"+(Format=="M"||Format=="X"?"C":"F"));                                 // Display temperature in °C (M) or °F (I)
-  //display.drawString(2, 42, String(bme_humi, 0)+"%");                                                                    // Display temperature and relative humidity in %
-  //display.drawString((Format=="I"?70:62),20, String(bme_pres, (Format=="I"?1:0))+(Format=="M"||Format=="X"?"hPa":"in")); // Display air pressure in hecto Pascals or inches
-  //display.drawString((Format=="I"?70:62),42, String(Calculate_WindSpeed(), 1) + (Format=="I"||Format=="X"?"mph":"kph")); // Display wind speed in mph (X) or kph (M)
-  //display.drawString(62,52, String(Calculate_WindDirection(), 0) + "°");                                               // Display wind direction
-  Serial.print(String(Calculate_WindSpeed(), 1) + (Format == "I" || Format == "X" ? "mph" : "kph")); // Output wind speed in mph (X) or kph (M)
+  UpdateLocalTime();
+  float windSpeed = Calculate_WindSpeed();
+  int windDirection = Calculate_WindDirection();
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+  Serial.print(String(Calculate_WindSpeed(), 1) + (Format == "I" || Format == "M" ? "mph" : "kph")); // Output wind speed in mph (X) or kph (M)
   Serial.print(" ");
   Serial.println(String(Calculate_WindDirection(), 0) + "°"); // Output wind direction in degrees
   Serial.print("DHT Temperature: ");
@@ -94,14 +86,33 @@ void loop() {
   Serial.print(dht_humi);
   Serial.println("%");
   Serial.print("Temperature: ");
-  Serial.print(temperature);
   Serial.print(" °C");
   Serial.print(" Pressure: ");
-  Serial.print(pressure);
-  Serial.println(" hPa");  
-  //display.setFont(ArialMT_Plain_10);                                                                                     // Set the Font to normal
-  //display.display();                                                                                                     // Update display
-  delay(1000);                                                                                                            // Small arbitrary delay
+  Serial.println(" hPa");
+
+  //QUERY STRING
+  String queryString = serverURL;
+  queryString += "?wind_speed=" + String (windSpeed, 1);
+  queryString += "&wind_direction=" + String(windDirection);
+  queryString += "&temperature=" + String(temperature, 2);
+  queryString += "&humidity=" + String(humidity, 2);
+
+  // SEND REQUEST
+  HTTPClient http;
+  http.begin(queryString);
+
+  int httpResponseCode = http.GET();
+  if (httpResponseCode == HTTP_CODE_OK) {
+    Serial.println("HTTP request sent successfully");
+  } else {
+    Serial.print("HTTP request failed with error code: ");
+    Serial.println(httpResponseCode);
+  }
+
+  http.end();
+
+
+  delay(10000);                                                                                                           
 }
 //#########################################################################################
 void UpdateLocalTime() {
@@ -169,7 +180,10 @@ void Start_Time_Services() {
 
 float Calculate_WindSpeed() {
   if ((millis() - Last_Event_Time) > 2) { // Ignore short time intervals to debounce switch contacts
-    WindSpeed = (1.00F / (((millis() - Last_Event_Time) / 1000.00F) * 2)) * WS_Calibration; // Calculate wind speed
+    float timeDiff = (millis() - Last_Event_Time) / 1000.00F;
+    if (timeDiff != 0) {
+      WindSpeed = (1.00F / (timeDiff * 2)) * WS_Calibration; // Calculate wind speed
+    }
   }
   // Calculate average wind speed
   WS_Total                         = WS_Total - WSpeedReadings[WS_Samples_Index]; // Subtract the last reading:
