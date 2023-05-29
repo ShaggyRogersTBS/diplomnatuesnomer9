@@ -4,31 +4,33 @@ $windSpeed = $_GET['wind_speed'];
 $windDirection = $_GET['wind_direction'];
 $temperature = $_GET['temperature'];
 $humidity = $_GET['humidity'];
+$date = date('d-m-y');  // Промени формата на датата на "d-m-y"
+$time = date('H:i');   // Промени формата на часа на "H:i"
 
 // Database connection configuration
 $servername = "localhost";
-$username = "root"; // Change to your MySQL username
-$password = ""; // Change to your MySQL password
-$dbname = "your_database_name"; // Change to your database name
+$username = "root"; // Промени съответно за вашия MySQL потребител
+$password = ""; // Промени съответно за вашия MySQL парола
+$dbname = "your_database_name"; // Промени съответно за името на вашата база данни
 
-// Create a new connection
+// Създаване на нова връзка
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check the connection
+// Проверка на връзката
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Prepare the SQL statement to insert the measurements into the "weather2" table
-$sql = "INSERT INTO weather2 (wind_speed, wind_direction, temperature, humidity) VALUES ('$windSpeed', '$windDirection', '$temperature', '$humidity')";
+// Подготовка на SQL заявката за вмъкване на измерванията в таблицата "weather2"
+$sql = "INSERT INTO weather2 (wind_speed, wind_direction, temperature, humidity, date, time) VALUES ('$windSpeed', '$windDirection', '$temperature', '$humidity', '$date', '$time')";
 
-// Execute the SQL statement
+// Изпълнение на SQL заявката
 if ($conn->query($sql) === TRUE) {
     echo "Measurements saved successfully";
 } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
 }
 
-// Close the database connection
+// Затваряне на връзката с базата данни
 $conn->close();
 ?>
