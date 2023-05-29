@@ -1,33 +1,34 @@
 <?php
+// Get the measurements from the query parameters
+$windSpeed = $_GET['wind_speed'];
+$windDirection = $_GET['wind_direction'];
+$temperature = $_GET['temperature'];
+$humidity = $_GET['humidity'];
 
-if(isset($_POST["temperature"], $_POST["humidity"], $_POST["wind_speed"], $_POST["pressure"], $_POST["wind_direction"])) {
-   $temperature = $_POST["temperature"]; 
-   $humidity = $_POST["humidity"];
-   $wind_speed = $_POST["wind_speed"];
-   $pressure = $_POST["pressure"];
-   $wind_direction = $_POST["wind_direction"];
+// Database connection configuration
+$servername = "localhost";
+$username = "root"; // Change to your MySQL username
+$password = ""; // Change to your MySQL password
+$dbname = "your_database_name"; // Change to your database name
 
-   $servername = "localhost";
-   $username = "root";
-   $password = "";
-   $database_name = "weather_diplomna";
+// Create a new connection
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-   $connection = new mysqli($servername, $username, $password, $database_name);
-   if ($connection->connect_error) {
-      die("MySQL connection failed: " . $connection->connect_error);
-   }
-
-   $sql = "INSERT INTO weather (temperature, humidity, wind_speed, pressure, wind_direction) 
-           VALUES ($temperature, $humidity, $wind_speed, $pressure, $wind_direction)";
-
-   if ($connection->query($sql) === TRUE) {
-      echo "New record created successfully";
-   } else {
-      echo "Error: " . $sql . " => " . $connection->error;
-   }
-
-   $connection->close();
-} else {
-   echo "temperature is not set in the HTTP request";
+// Check the connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
+
+// Prepare the SQL statement to insert the measurements into the "weather2" table
+$sql = "INSERT INTO weather2 (wind_speed, wind_direction, temperature, humidity) VALUES ('$windSpeed', '$windDirection', '$temperature', '$humidity')";
+
+// Execute the SQL statement
+if ($conn->query($sql) === TRUE) {
+    echo "Measurements saved successfully";
+} else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
+}
+
+// Close the database connection
+$conn->close();
 ?>
