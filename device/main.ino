@@ -2,9 +2,9 @@
 #include <HTTPClient.h>
 //#include <Wire.h>
 #include <time.h>
-#include <Adafruit_Sensor.h>
+//#include <Adafruit_Sensor.h>
 #include <DHT.h>
-#include <Adafruit_BMP085.h>
+//#include <Adafruit_BMP085.h>
 
 Adafruit_BMP085 bmp;             // I2C
 
@@ -15,14 +15,14 @@ const char* Timezone = "EST-2METDST,M3.5.0/01,M10.5.0/02"; // Most of Europe
 
 String      Format   = "M";       // Time format M for dd-mm-yy and 23:59:59, "I" for mm-dd-yy and 12:59:59 PM, "X" for Metric units but WSpeed in MPH
 
-#define pressure_offset 3.5       // Air pressure calibration, adjust for your altitude
+//#define pressure_offset 3.5       // Air pressure calibration, adjust for your altitude
 #define WS_Calibration  1.1       // Wind Speed calibration factor
 #define WS_Samples      10        // Number of Wind Speed samples for an average
 #define WindSensorPin   4       // Only use pins that can support an interrupt
 #define DHTPin          23
 #define DHTType         DHT11
-#define BMP180_SDA_PIN 21
-#define BMP180_SCL_PIN 22
+//#define BMP180_SDA_PIN 21
+//#define BMP180_SCL_PIN 22
 
 DHT dht(DHTPin, DHTType);
 
