@@ -13,7 +13,7 @@ const char* password = "esp32esp";
 const char* serverURL = "http://172.20.10.2/weather.php";
 const char* Timezone = "EST-2METDST,M3.5.0/01,M10.5.0/02"; // Most of Europe
 
-String      Format   = "X";       // Time format M for dd-mm-yy and 23:59:59, "I" for mm-dd-yy and 12:59:59 PM, "X" for Metric units but WSpeed in MPH
+String      Format   = "M";       // Time format M for dd-mm-yy and 23:59:59, "I" for mm-dd-yy and 12:59:59 PM, "X" for Metric units but WSpeed in MPH
 
 #define pressure_offset 3.5       // Air pressure calibration, adjust for your altitude
 #define WS_Calibration  1.1       // Wind Speed calibration factor
@@ -26,6 +26,11 @@ String      Format   = "X";       // Time format M for dd-mm-yy and 23:59:59, "I
 
 DHT dht(DHTPin, DHTType);
 
+const int windDirectionPin = 36; // VP = 36 VN = 39
+const int numReadings = 5;       // Number of readings for moving average
+int windDirectionReadings[numReadings]; // Array to store wind direction readings
+int windDirectionIndex = 0;      // Index of the current reading
+float windDirectionTotal = 0;    // Total sum of the readings
 static String         Date_str, Time_str;
 volatile unsigned int local_Unix_time = 0, next_update_due = 0;
 volatile unsigned int update_duration = 60 * 60; // Time duration in seconds, so synchronise every hour
@@ -35,8 +40,8 @@ float WSpeedReadings[WS_Samples]; // To hold readings from the Wind Speed Sensor
 int   WS_Samples_Index = 0;       // The index of the current wind speed reading
 float WS_Total         = 0;       // The running wind speed total
 float WS_Average       = 0;       // The wind speed average
-float dht_temp = dht.readTemperature();
-float dht_humi = dht.readHumidity();
+//float dht_temp = dht.readTemperature();
+//float dht_humi = dht.readHumidity();
 
 //#########################################################################################
 void IRAM_ATTR MeasureWindSpeed_ISR() {
@@ -59,6 +64,7 @@ void setup() {
   //Wire.begin();
   //bmp.begin();           // For Adafruit sensors use address 0x77, for most 3rd party types use address 0x76              
   StartWiFi();
+  dht.begin();
   Start_Time_Services();
   Setup_Interrupts_and_Initialise_Clock();       // Now setup a timer interrupt to occur every 1-second, to keep seconds accurate
   for (int index = 0; index < WS_Samples; index++) { // Now clear the Wind Speed average array
@@ -80,15 +86,17 @@ void loop() {
   Serial.print(" ");
   Serial.println(String(Calculate_WindDirection(), 0) + "°"); // Output wind direction in degrees
   Serial.print("DHT Temperature: ");
-  Serial.print(dht_temp);
+  Serial.print(temperature);
   Serial.print("°C");
   Serial.print(" DHT Humidity: ");
-  Serial.print(dht_humi);
+  Serial.print(humidity);
   Serial.println("%");
-  Serial.print("Temperature: ");
-  Serial.print(" °C");
-  Serial.print(" Pressure: ");
-  Serial.println(" hPa");
+  //Serial.print("Temperature: ");
+  //Serial.print(" °C");
+  //Serial.print(" Pressure: ");
+  //Serial.println(" hPa");
+  Serial.print(Date_str);
+  Serial.print(Time_str);
 
   //QUERY STRING
   String queryString = serverURL;
@@ -96,6 +104,8 @@ void loop() {
   queryString += "&wind_direction=" + String(windDirection);
   queryString += "&temperature=" + String(temperature, 2);
   queryString += "&humidity=" + String(humidity, 2);
+  queryString += "&date" + Date_str;
+  queryString += "&time" + Time_str;
 
   // SEND REQUEST
   HTTPClient http;
@@ -199,7 +209,39 @@ float Calculate_WindSpeed() {
 }
 
 float Calculate_WindDirection() {
-  int winddirection = analogRead(36); // VP = 36 VN = 39
-  return map(winddirection,0,3095,0,359);
-}
+  // Read the raw wind direction value
+  int windDirectionRaw = analogRead(windDirectionPin);
 
+  // Subtract the oldest reading from the total
+  windDirectionTotal -= windDirectionReadings[windDirectionIndex];
+
+  // Store the new reading in the array
+  windDirectionReadings[windDirectionIndex] = windDirectionRaw;
+
+  // Add the new reading to the total
+  windDirectionTotal += windDirectionRaw;
+
+  // Increment the index and wrap around if necessary
+  windDirectionIndex++;
+  if (windDirectionIndex >= numReadings) {
+    windDirectionIndex = 0;
+  }
+
+  // Calculate the moving average
+  int windDirectionAverage = windDirectionTotal / numReadings;
+
+  // Calibration data
+  const int windDirectionMin = 0;
+  const int windDirectionMax = 3095;
+  const int windDirectionRange = 360;
+
+  // Map the averaged wind direction value to the calibrated range
+  int calibratedDirection = map(windDirectionAverage, windDirectionMin, windDirectionMax, 0, windDirectionRange);
+
+  // Ensure the wind direction value doesn't exceed 360 degrees
+  if (calibratedDirection >= windDirectionRange) {
+    calibratedDirection = calibratedDirection % windDirectionRange;
+  }
+
+  return calibratedDirection;
+}
